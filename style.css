@@ -1,0 +1,14 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+
+#quoteDisplay {
+  margin: 20px 0;
+  font-style: italic;
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+}
