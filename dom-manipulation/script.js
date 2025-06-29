@@ -1,12 +1,8 @@
-const quotes = [
-  { text: "The journey of a thousand miles begins with one step.", category: "Motivation" },
-  { text: "Code is like humor. When you have to explain it, it’s bad.", category: "Programming" }
-];
+const quotes = [];
 
 function loadQuotes() {
   const stored = localStorage.getItem("quotes");
   if (stored) {
-    quotes.length = 0;
     quotes.push(...JSON.parse(stored));
   }
 }
@@ -69,12 +65,14 @@ function addQuote() {
   const text = document.getElementById("newQuoteText").value.trim();
   const category = document.getElementById("newQuoteCategory").value.trim();
   if (text && category) {
-    quotes.push({ text, category });
+    const newQuote = { text, category };
+    quotes.push(newQuote);
     saveQuotes();
-    document.getElementById("newQuoteText").value = "";
-    document.getElementById("newQuoteCategory").value = "";
+    postQuoteToServer(newQuote);
     populateCategories();
     filterQuotes();
+    document.getElementById("newQuoteText").value = "";
+    document.getElementById("newQuoteCategory").value = "";
   }
 }
 
@@ -91,20 +89,20 @@ function exportQuotes() {
 
 function importFromJsonFile(event) {
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     try {
       const importedQuotes = JSON.parse(e.target.result);
       if (Array.isArray(importedQuotes)) {
         quotes.push(...importedQuotes);
         saveQuotes();
-        alert("Quotes imported successfully!");
         populateCategories();
         filterQuotes();
+        alert("Quotes imported successfully!");
       } else {
-        alert("Invalid format.");
+        alert("Invalid file format.");
       }
-    } catch (error) {
-      alert("Error parsing file.");
+    } catch {
+      alert("Could not read JSON file.");
     }
   };
   reader.readAsText(event.target.files[0]);
@@ -112,42 +110,55 @@ function importFromJsonFile(event) {
 
 async function fetchQuotesFromServer() {
   try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-    const data = await response.json();
+    const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await res.json();
     return data.slice(0, 5).map(post => ({
       text: post.title,
       category: "Server"
     }));
-  } catch (error) {
-    console.error("Failed to fetch from server:", error);
+  } catch {
     return [];
   }
 }
 
-async function syncWithServer() {
+async function postQuoteToServer(quote) {
   try {
-    const serverQuotes = await fetchQuotesFromServer();
-    const combined = [...serverQuotes, ...quotes];
-    const uniqueQuotes = Array.from(new Map(
-      combined.map(q => [q.text, q])
-    ).values());
-    quotes.length = 0;
-    quotes.push(...uniqueQuotes);
-    saveQuotes();
-    alert("Synced with server!");
-    populateCategories();
-    filterQuotes();
-  } catch (err) {
-    console.error("Sync failed:", err);
-    alert("Sync failed. Check your internet connection.");
+    await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(quote)
+    });
+  } catch {
+    console.warn("Could not post to server.");
   }
 }
+
+async function syncQuotes() {
+  const serverQuotes = await fetchQuotesFromServer();
+  const combined = [...serverQuotes, ...quotes];
+  const unique = Array.from(new Map(combined.map(q => [q.text, q])).values());
+  quotes.length = 0;
+  quotes.push(...unique);
+  saveQuotes();
+  populateCategories();
+  filterQuotes();
+  const notif = document.createElement("div");
+  notif.textContent = "Quotes synced with server.";
+  notif.style.background = "#d4edda";
+  notif.style.padding = "10px";
+  notif.style.marginTop = "10px";
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 3000);
+}
+
+setInterval(syncQuotes, 30000); 
 
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
 loadQuotes();
 createAddQuoteForm();
 populateCategories();
-
 const last = sessionStorage.getItem("lastQuote");
 if (last) {
   const quote = JSON.parse(last);
