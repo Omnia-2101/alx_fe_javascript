@@ -8,7 +8,10 @@ function showRandomQuote() {
   let filteredQuotes = category === 'all' ? quotes : quotes.filter(q => q.category === category);
   if (filteredQuotes.length === 0) return;
   const randomQuote = filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)];
-  document.getElementById('quoteDisplay').innerHTML = `<p>${randomQuote.text}</p>`;
+  document.getElementById('quoteDisplay').innerHTML = '';
+  const p = document.createElement('p');
+  p.textContent = randomQuote.text;
+  document.getElementById('quoteDisplay').appendChild(p);
 }
 
 function addQuote() {
@@ -19,9 +22,15 @@ function addQuote() {
 
   if (!text || !category) return;
 
-  quotes.push({ text, category });
+  const newQuote = { text, category };
+  quotes.push(newQuote);
   saveQuotes();
   populateCategories();
+
+  const p = document.createElement('p');
+  p.textContent = newQuote.text;
+  document.getElementById('quoteDisplay').appendChild(p);
+
   textInput.value = '';
   categoryInput.value = '';
 }
@@ -79,13 +88,11 @@ async function fetchQuotesFromServer() {
   try {
     const response = await fetch('https://jsonplaceholder.typicode.com/posts');
     const data = await response.json();
-    const serverQuotes = data.slice(0, 5).map(item => ({
+    return data.slice(0, 5).map(item => ({
       text: item.title,
       category: "Server"
     }));
-    return serverQuotes;
-  } catch (error) {
-    console.error("Failed to fetch from server:", error);
+  } catch {
     return [];
   }
 }
