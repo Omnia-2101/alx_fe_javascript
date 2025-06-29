@@ -7,15 +7,8 @@
 </head>
 <body>
   <h1>Dynamic Quote Generator</h1>
-
-  <div>
-    <button id="newQuote">Show New Quote</button>
-    <select id="categoryFilter" onchange="filterQuotes()">
-      <option value="all">All Categories</option>
-    </select>
-  </div>
-
   <div id="quoteDisplay"></div>
+  <button id="newQuote">Show New Quote</button>
 
   <div>
     <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
@@ -24,11 +17,17 @@
   </div>
 
   <div>
-    <button onclick="exportQuotes()">Export Quotes</button>
-    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+    <select id="categoryFilter" onchange="filterQuotes()">
+      <option value="all">All Categories</option>
+    </select>
   </div>
 
-  <div id="notification"></div>
+  <div>
+    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+    <button onclick="exportQuotes()">Export Quotes</button>
+  </div>
+
+  <div id="notification" style="display:none; background:lightgreen; padding:5px; margin-top:10px;"></div>
 
   <script src="script.js"></script>
 </body>
