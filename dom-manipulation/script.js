@@ -144,14 +144,16 @@ async function syncQuotes() {
   saveQuotes();
   populateCategories();
   filterQuotes();
+
   const notif = document.createElement("div");
-  notif.textContent = "Quotes synced with server.";
+  notif.textContent = "Quotes synced with server!";
   notif.style.background = "#d4edda";
   notif.style.padding = "10px";
   notif.style.marginTop = "10px";
   document.body.appendChild(notif);
   setTimeout(() => notif.remove(), 3000);
 }
+
 
 setInterval(syncQuotes, 30000); 
 
