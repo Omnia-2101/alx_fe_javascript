@@ -121,6 +121,35 @@ function importFromJsonFile(event) {
   reader.readAsText(event.target.files[0]);
 }
 
+function syncWithServer() {
+  fetch("https://jsonplaceholder.typicode.com/posts")
+    .then(response => response.json())
+    .then(data => {
+      const serverQuotes = data.slice(0, 5).map(post => ({
+        text: post.title,
+        category: "Server"
+      }));
+
+      const combined = [...serverQuotes, ...quotes];
+
+      const uniqueQuotes = Array.from(new Map(
+        combined.map(q => [q.text, q])
+      ).values());
+
+      quotes.length = 0;
+      quotes.push(...uniqueQuotes);
+      saveQuotes();
+
+      alert("Synced with server!");
+      populateCategories();
+      filterQuotes();
+    })
+    .catch(err => {
+      console.error("Sync failed:", err);
+      alert("Sync failed. Check your internet connection.");
+    });
+}
+
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
 loadQuotes();
 createAddQuoteForm();
