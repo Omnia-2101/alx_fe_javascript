@@ -121,17 +121,21 @@ function importFromJsonFile(event) {
   reader.readAsText(event.target.files[0]);
 }
 
-function syncWithServer() {
-  fetch("https://jsonplaceholder.typicode.com/posts")
+function fetchQuotesFromServer() {
+  return fetch("https://jsonplaceholder.typicode.com/posts")
     .then(response => response.json())
     .then(data => {
-      const serverQuotes = data.slice(0, 5).map(post => ({
+      return data.slice(0, 5).map(post => ({
         text: post.title,
         category: "Server"
       }));
+    });
+}
 
+function syncWithServer() {
+  fetchQuotesFromServer()
+    .then(serverQuotes => {
       const combined = [...serverQuotes, ...quotes];
-
       const uniqueQuotes = Array.from(new Map(
         combined.map(q => [q.text, q])
       ).values());
