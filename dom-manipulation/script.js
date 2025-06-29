@@ -3,7 +3,7 @@ let quotes = [
   { text: "Code is like humor. When you have to explain it, it’s bad.", category: "Programming" }
 ];
 
-function showRandomQuote() {
+function displayRandomQuote() {
   const quote = quotes[Math.floor(Math.random() * quotes.length)];
   const display = document.getElementById("quoteDisplay");
   display.innerText = `"${quote.text}" - ${quote.category}`;
@@ -17,10 +17,10 @@ function addQuote() {
     quotes.push({ text, category });
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
-    showRandomQuote(); // Show the newly added quote
+    displayRandomQuote(); // Use updated function name
   } else {
     alert("Please fill in both fields.");
   }
 }
 
-document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
